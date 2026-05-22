@@ -13,6 +13,8 @@ export default function CommunityPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
+  const [isFallbackMode, setIsFallbackMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Form State
   const [writeNickname, setWriteNickname] = useState("");
@@ -21,9 +23,33 @@ export default function CommunityPage() {
   const [writeContent, setWriteContent] = useState("");
   const [formError, setFormError] = useState("");
 
-  // Load posts from localStorage on mount
+  // Load posts from API or fallback to localStorage
   useEffect(() => {
-    setPosts(getPosts());
+    async function loadPosts() {
+      try {
+        const res = await fetch("/api/posts");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.fallback) {
+            console.warn("Database not configured. Falling back to local storage.");
+            setIsFallbackMode(true);
+            setPosts(getPosts());
+          } else {
+            setPosts(Array.isArray(data) ? data : []);
+          }
+        } else {
+          setIsFallbackMode(true);
+          setPosts(getPosts());
+        }
+      } catch (err) {
+        console.error("API call failed, falling back to local storage:", err);
+        setIsFallbackMode(true);
+        setPosts(getPosts());
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPosts();
   }, []);
 
   // Filter posts
@@ -69,7 +95,7 @@ export default function CommunityPage() {
   };
 
   // Submit Post
-  const handleWriteSubmit = (e: React.FormEvent) => {
+  const handleWriteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!writeNickname.trim()) {
       setFormError("닉네임을 입력해 주세요.");
@@ -84,8 +110,41 @@ export default function CommunityPage() {
       return;
     }
 
-    const newPost = addPost(writeTitle, writeContent, writeNickname, writeCategory);
-    setPosts([newPost, ...posts]);
+    if (isFallbackMode) {
+      const newPost = addPost(writeTitle, writeContent, writeNickname, writeCategory);
+      setPosts([newPost, ...posts]);
+    } else {
+      try {
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: writeTitle,
+            content: writeContent,
+            nickname: writeNickname,
+            category: writeCategory,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.fallback) {
+            const newPost = addPost(writeTitle, writeContent, writeNickname, writeCategory);
+            setPosts([newPost, ...posts]);
+          } else {
+            setPosts([data, ...posts]);
+          }
+        } else {
+          throw new Error("HTTP error during post creation");
+        }
+      } catch (err) {
+        console.error("API post failed, falling back to local storage:", err);
+        const newPost = addPost(writeTitle, writeContent, writeNickname, writeCategory);
+        setPosts([newPost, ...posts]);
+      }
+    }
     
     // Reset form
     setWriteNickname("");
@@ -176,7 +235,11 @@ export default function CommunityPage() {
 
         {/* Post List */}
         <div className="bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm">
-          {paginatedPosts.length === 0 ? (
+          {loading ? (
+            <div className="py-20 text-center">
+              <p className="text-gray-400 text-sm animate-pulse">게시글을 불러오는 중입니다...</p>
+            </div>
+          ) : paginatedPosts.length === 0 ? (
             <div className="py-20 text-center">
               <p className="text-gray-400 text-sm">등록된 게시글이 없습니다. 첫 글을 작성해 보세요!</p>
             </div>

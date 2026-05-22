@@ -15,13 +15,52 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      // Increment views and fetch post data on the client side
-      incrementViews(id);
-      const postData = getPostById(id);
-      setPost(postData);
-      setLoading(false);
+    if (!id) return;
+
+    async function loadPostDetail() {
+      try {
+        // Try incrementing views first via the API
+        let apiPost: Post | null = null;
+        try {
+          const viewRes = await fetch(`/api/posts/${id}/view`, { method: "POST" });
+          if (viewRes.ok) {
+            const data = await viewRes.json();
+            if (!data.fallback) {
+              apiPost = data;
+            }
+          }
+        } catch (err) {
+          console.error("Failed to increment views via API:", err);
+        }
+
+        // If view increment was successful and gave us the updated post, use it
+        if (apiPost) {
+          setPost(apiPost);
+        } else {
+          // Otherwise fetch post via API
+          const res = await fetch(`/api/posts/${id}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.fallback) {
+              throw new Error("API fallback requested");
+            }
+            setPost(data);
+          } else {
+            throw new Error(`HTTP error ${res.status}`);
+          }
+        }
+      } catch (err) {
+        console.warn("API failed, falling back to local storage:", err);
+        // Fallback to localStorage
+        incrementViews(id);
+        const localPost = getPostById(id);
+        setPost(localPost);
+      } finally {
+        setLoading(false);
+      }
     }
+
+    loadPostDetail();
   }, [id]);
 
   return (

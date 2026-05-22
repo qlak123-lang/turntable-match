@@ -1,0 +1,52 @@
+import { NextResponse } from 'next/server';
+import { dbQuery, getDbPool } from '@/utils/db';
+
+function formatDbPost(row: any) {
+  const date = new Date(row.created_at);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const createdAt = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  return {
+    id: row.id.toString(),
+    title: row.title,
+    content: row.content,
+    nickname: row.nickname,
+    category: row.category,
+    views: row.views,
+    createdAt
+  };
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const db = getDbPool();
+  if (!db) {
+    return NextResponse.json({ error: 'Database not configured', fallback: true }, { status: 200 });
+  }
+
+  try {
+    const { id } = await params;
+    
+    // Check if ID is integer (db primary key in schema.sql is SERIAL id)
+    const intId = parseInt(id, 10);
+    if (isNaN(intId)) {
+      return NextResponse.json({ error: 'Invalid post ID format', fallback: true }, { status: 200 });
+    }
+
+    const rows = await dbQuery('SELECT * FROM posts WHERE id = $1', [intId]);
+    if (rows.length === 0) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    const formatted = formatDbPost(rows[0]);
+    return NextResponse.json(formatted);
+  } catch (err: any) {
+    console.error('Error fetching post from database:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
