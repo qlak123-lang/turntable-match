@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import styles from "./StickyHeader.module.css";
 
 interface StickyHeaderProps {
-  onScrollToBooking: () => void;
+  onScrollToBooking?: () => void;
 }
 
 export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
+  const pathname = usePathname();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -25,26 +28,26 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const headerOffset = 70;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+  const handleLogoClick = () => {
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.location.href = "/";
+    }
+  };
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
+  const handleCtaClick = () => {
+    if (pathname === "/" && onScrollToBooking) {
+      onScrollToBooking();
+    } else {
+      window.location.href = "/#booking";
     }
   };
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logo} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+        <div className={styles.logo} onClick={handleLogoClick}>
           <div className={styles.logoIcon}>T</div>
           <span>턴테이블 매치</span>
         </div>
@@ -52,37 +55,29 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
         <nav className={styles.nav}>
           <ul className={styles.navLinks}>
             <li>
-              <a href="#concept" onClick={(e) => handleLinkClick(e, "concept")} className={styles.navLink}>
-                모임 컨셉
-              </a>
+              <Link
+                href="/"
+                className={`${styles.navLink} ${pathname === "/" ? styles.active : ""}`}
+                onClick={(e) => {
+                  if (pathname === "/") {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              >
+                홈
+              </Link>
             </li>
             <li>
-              <a href="#simulator" onClick={(e) => handleLinkClick(e, "simulator")} className={styles.navLink}>
-                시뮬레이터
-              </a>
-            </li>
-            <li>
-              <a href="#process" onClick={(e) => handleLinkClick(e, "process")} className={styles.navLink}>
-                진행 매뉴얼
-              </a>
-            </li>
-            <li>
-              <a href="#security" onClick={(e) => handleLinkClick(e, "security")} className={styles.navLink}>
-                안심 보안
-              </a>
-            </li>
-            <li>
-              <a href="#booking" onClick={(e) => handleLinkClick(e, "booking")} className={styles.navLink}>
-                예약 일정
-              </a>
-            </li>
-            <li>
-              <a href="#faq" onClick={(e) => handleLinkClick(e, "faq")} className={styles.navLink}>
-                자주 묻는 질문
-              </a>
+              <Link
+                href="/community"
+                className={`${styles.navLink} ${pathname.startsWith("/community") ? styles.active : ""}`}
+              >
+                커뮤니티
+              </Link>
             </li>
           </ul>
-          <button className={styles.ctaBtn} onClick={onScrollToBooking}>
+          <button className={styles.ctaBtn} onClick={handleCtaClick}>
             실시간 남은 좌석 확인
           </button>
         </nav>
@@ -105,41 +100,35 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
       <div className={`${styles.mobileNav} ${mobileMenuOpen ? styles.mobileNavOpen : ""}`}>
         <ul className={styles.mobileLinks}>
           <li>
-            <a href="#concept" onClick={(e) => handleLinkClick(e, "concept")} className={styles.mobileLink}>
-              모임 컨셉
-            </a>
+            <Link
+              href="/"
+              className={`${styles.mobileLink} ${pathname === "/" ? styles.active : ""}`}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (pathname === "/") {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+            >
+              홈
+            </Link>
           </li>
           <li>
-            <a href="#simulator" onClick={(e) => handleLinkClick(e, "simulator")} className={styles.mobileLink}>
-              시뮬레이터
-            </a>
-          </li>
-          <li>
-            <a href="#process" onClick={(e) => handleLinkClick(e, "process")} className={styles.mobileLink}>
-              진행 매뉴얼
-            </a>
-          </li>
-          <li>
-            <a href="#security" onClick={(e) => handleLinkClick(e, "security")} className={styles.mobileLink}>
-              안심 보안
-            </a>
-          </li>
-          <li>
-            <a href="#booking" onClick={(e) => handleLinkClick(e, "booking")} className={styles.mobileLink}>
-              예약 일정
-            </a>
-          </li>
-          <li>
-            <a href="#faq" onClick={(e) => handleLinkClick(e, "faq")} className={styles.mobileLink}>
-              자주 묻는 질문
-            </a>
+            <Link
+              href="/community"
+              className={`${styles.mobileLink} ${pathname.startsWith("/community") ? styles.active : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              커뮤니티
+            </Link>
           </li>
         </ul>
         <button 
           className={styles.ctaBtn} 
           onClick={() => {
             setMobileMenuOpen(false);
-            onScrollToBooking();
+            handleCtaClick();
           }}
           style={{ width: "100%" }}
         >
@@ -149,3 +138,4 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
     </header>
   );
 }
+

@@ -92,6 +92,17 @@
   width: 100%;
 }
 
+.navLink.active {
+  opacity: 1;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.navLink.active::after {
+  width: 100%;
+}
+
+
 .ctaBtn {
   background-color: var(--primary);
   color: white;
@@ -122,6 +133,11 @@
   background: linear-gradient(to right, var(--primary) 0%, #ff8a8f 100%);
   width: 0%;
   transition: width 0.1s ease-out;
+}
+
+/* Mobile navigation drawer */
+.mobileNav {
+  display: none;
 }
 
 /* Mobile burger menu */
@@ -199,5 +215,10 @@
   
   .mobileLink:hover {
     color: var(--primary);
+  }
+
+  .mobileLink.active {
+    color: var(--primary);
+    font-weight: 700;
   }
 }
