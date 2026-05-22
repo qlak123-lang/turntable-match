@@ -1,0 +1,333 @@
+.section {
+  background-color: var(--secondary);
+  color: var(--neutral-dark);
+}
+
+.titleArea {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.tagline {
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: rgba(61, 52, 52, 0.7);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+/* Reviews Carousel */
+.carouselContainer {
+  background-color: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(61, 52, 52, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 420px;
+}
+
+.carouselHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.carouselTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kakaoBadge {
+  background-color: #fee500;
+  color: #191919;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.carouselControls {
+  display: flex;
+  gap: 12px;
+}
+
+.controlBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--secondary);
+  border: 1px solid rgba(61, 52, 52, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: var(--neutral-dark);
+}
+
+.controlBtn:hover {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.reviewContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.chatBubbleList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chatBubble {
+  max-width: 80%;
+  padding: 14px 20px;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  position: relative;
+}
+
+.chatLeft {
+  align-self: flex-start;
+  background-color: #f1f0e8;
+  color: var(--neutral-dark);
+  border-top-left-radius: 4px;
+}
+
+.chatRight {
+  align-self: flex-end;
+  background-color: #fee500;
+  color: #191919;
+  border-top-right-radius: 4px;
+}
+
+.chatMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(61, 52, 52, 0.08);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.userVerify {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.reviewDate {
+  font-size: 0.85rem;
+  color: rgba(61, 52, 52, 0.5);
+}
+
+/* Recommendation Stat Card */
+.statCard {
+  background-color: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(61, 52, 52, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.radialProgress {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, white 79%, transparent 80% 100%),
+              conic-gradient(var(--primary) 65%, #f1f0e8 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.radialText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radialPercent {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--neutral-dark);
+  line-height: 1;
+}
+
+.radialLabel {
+  font-size: 0.8rem;
+  color: rgba(61, 52, 52, 0.6);
+  margin-top: 4px;
+}
+
+.statCardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.statCardDesc {
+  font-size: 0.9rem;
+  color: rgba(61, 52, 52, 0.65);
+  line-height: 1.6;
+}
+
+/* Success Marriage Stories Section */
+.marriageSection {
+  background-color: var(--neutral-light);
+  border-radius: 20px;
+  padding: 40px;
+  border: 1px solid rgba(61, 52, 52, 0.04);
+}
+
+.marriageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+.marriageTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.marriageCount {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.6rem;
+  font-family: var(--font-serif);
+}
+
+.marriageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.marriageCard {
+  background-color: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(61, 52, 52, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.marriageCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.marriageTag {
+  background-color: rgba(229, 107, 111, 0.1);
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.marriageCouple {
+  font-size: 0.85rem;
+  color: rgba(61, 52, 52, 0.6);
+  font-weight: 500;
+}
+
+.marriageText {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--neutral-dark);
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+
+.marriageText::before {
+  content: '"';
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.marriageText::after {
+  content: '"';
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.marriageDate {
+  align-self: flex-end;
+  font-size: 0.8rem;
+  color: rgba(61, 52, 52, 0.4);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .marriageGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .marriageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
