@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dbQuery, getDbPool } from '@/utils/db';
+import { revalidatePath } from 'next/cache';
 
 function formatDbPost(row: any) {
   const date = new Date(row.created_at);
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
     }
 
     const formatted = formatDbPost(rows[0]);
+    revalidatePath('/community');
     return NextResponse.json(formatted);
   } catch (err: any) {
     console.error('Error creating post in database:', err);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dbQuery, getDbPool } from '@/utils/db';
+import { revalidatePath } from 'next/cache';
 
 function formatDbPost(row: any) {
   const date = new Date(row.created_at);
@@ -46,6 +47,8 @@ export async function POST(
     }
 
     const formatted = formatDbPost(rows[0]);
+    revalidatePath('/community');
+    revalidatePath(`/community/${id}`);
     return NextResponse.json(formatted);
   } catch (err: any) {
     console.error('Error incrementing post views in database:', err);

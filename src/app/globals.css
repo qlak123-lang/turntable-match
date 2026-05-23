@@ -122,6 +122,17 @@
   }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Utility classes */
 .animate-pulse-red {
   animation: pulse 2s infinite;
@@ -133,6 +144,10 @@
 
 .animate-float {
   animation: float 4s ease-in-out infinite;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 .fade-transition {

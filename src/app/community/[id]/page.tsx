@@ -1,71 +1,71 @@
-"use client";
-
-import React, { useState, useEffect, use } from "react";
+import React from "react";
 import Link from "next/link";
 import StickyHeader from "@/components/StickyHeader";
-import { getPostById, incrementViews, getCategoryLabel, Post } from "@/utils/communityDb";
+import { getPostById, getCategoryLabel, Post } from "@/utils/communityDb";
+import { dbQuery, getDbPool } from "@/utils/db";
+import ViewCounter from "./ViewCounter";
+
+export const revalidate = 10; // Revalidate every 10 seconds (ISR)
 
 interface PostDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function PostDetailPage({ params }: PostDetailPageProps) {
-  const { id } = use(params);
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
+function formatDbPost(row: any): Post {
+  const date = new Date(row.created_at);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const createdAt = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  return {
+    id: row.id.toString(),
+    title: row.title,
+    content: row.content,
+    nickname: row.nickname,
+    category: row.category,
+    views: row.views || 0,
+    createdAt
+  };
+}
 
-  useEffect(() => {
-    if (!id) return;
+export async function generateStaticParams() {
+  const db = getDbPool();
+  if (!db) return [];
+  try {
+    const rows = await dbQuery('SELECT id FROM posts ORDER BY created_at DESC LIMIT 50');
+    return rows.map((row) => ({ id: row.id.toString() }));
+  } catch (err) {
+    console.error("Failed to generate static params:", err);
+    return [];
+  }
+}
 
-    async function loadPostDetail() {
-      try {
-        // Try incrementing views first via the API
-        let apiPost: Post | null = null;
-        try {
-          const viewRes = await fetch(`/api/posts/${id}/view`, { method: "POST" });
-          if (viewRes.ok) {
-            const data = await viewRes.json();
-            if (!data.fallback) {
-              apiPost = data;
-            }
-          }
-        } catch (err) {
-          console.error("Failed to increment views via API:", err);
-        }
+export default async function PostDetailPage({ params }: PostDetailPageProps) {
+  const { id } = await params;
+  const db = getDbPool();
+  let post: Post | null = null;
+  const intId = parseInt(id, 10);
 
-        // If view increment was successful and gave us the updated post, use it
-        if (apiPost) {
-          setPost(apiPost);
-        } else {
-          // Otherwise fetch post via API
-          const res = await fetch(`/api/posts/${id}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.fallback) {
-              throw new Error("API fallback requested");
-            }
-            setPost(data);
-          } else {
-            throw new Error(`HTTP error ${res.status}`);
-          }
-        }
-      } catch (err) {
-        console.warn("API failed, falling back to local storage:", err);
-        // Fallback to localStorage
-        incrementViews(id);
-        const localPost = getPostById(id);
-        setPost(localPost);
-      } finally {
-        setLoading(false);
+  if (!db || isNaN(intId)) {
+    post = getPostById(id);
+  } else {
+    try {
+      const rows = await dbQuery('SELECT * FROM posts WHERE id = $1', [intId]);
+      if (rows.length > 0) {
+        post = formatDbPost(rows[0]);
       }
+    } catch (err) {
+      console.error("Failed to fetch post in Server Component, using mock fallback:", err);
+      post = getPostById(id);
     }
-
-    loadPostDetail();
-  }, [id]);
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#3D3434] font-sans flex flex-col pt-[70px]">
       <StickyHeader />
+      <ViewCounter id={id} />
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-10">
         {/* Navigation Bar Back Button */}
@@ -88,11 +88,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
         </div>
 
         {/* Detailed Post Card */}
-        {loading ? (
-          <div className="bg-white rounded-3xl border border-gray-200/80 shadow-sm p-8 text-center py-20">
-            <p className="text-gray-400 text-sm">로딩 중...</p>
-          </div>
-        ) : !post ? (
+        {!post ? (
           <div className="bg-white rounded-3xl border border-gray-200/80 shadow-sm p-8 text-center py-20">
             <p className="text-gray-400 text-sm mb-4">존재하지 않거나 삭제된 게시글입니다.</p>
             <Link

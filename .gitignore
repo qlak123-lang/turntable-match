@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Netlify & Playwright tools
+.netlify/
+.playwright-mcp/
+/login_page_lounge.png
+

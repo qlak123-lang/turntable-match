@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import styles from "./StickyHeader.module.css";
+import { useAuth } from "@/context/AuthContext";
 
 interface StickyHeaderProps {
   onScrollToBooking?: () => void;
@@ -13,6 +14,7 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
   const pathname = usePathname();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,6 +72,14 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
             </li>
             <li>
               <Link
+                href="/store"
+                className={`${styles.navLink} ${pathname.startsWith("/store") ? styles.active : ""}`}
+              >
+                스토어
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/community"
                 className={`${styles.navLink} ${pathname.startsWith("/community") ? styles.active : ""}`}
               >
@@ -80,6 +90,31 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
           <button className={styles.ctaBtn} onClick={handleCtaClick}>
             실시간 남은 좌석 확인
           </button>
+
+          {/* User Auth Section */}
+          {user ? (
+            <div className={styles.userInfo}>
+              <span className={styles.nickname}>
+                {user.nickname}님
+                {user.isAdmin && <span className={styles.adminBadge}>Admin</span>}
+              </span>
+              <Link href="/mypage" className={styles.authBtn}>
+                마이페이지
+              </Link>
+              {user.isAdmin && (
+                <Link href="/admin" className={`${styles.authBtn} ${styles.adminBtn}`}>
+                  관리자
+                </Link>
+              )}
+              <button className={styles.authBtn} onClick={logout}>
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className={styles.authBtn}>
+              로그인
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -116,6 +151,15 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
           </li>
           <li>
             <Link
+              href="/store"
+              className={`${styles.mobileLink} ${pathname.startsWith("/store") ? styles.active : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              스토어
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/community"
               className={`${styles.mobileLink} ${pathname.startsWith("/community") ? styles.active : ""}`}
               onClick={() => setMobileMenuOpen(false)}
@@ -130,12 +174,62 @@ export default function StickyHeader({ onScrollToBooking }: StickyHeaderProps) {
             setMobileMenuOpen(false);
             handleCtaClick();
           }}
-          style={{ width: "100%" }}
+          style={{ width: "100%", marginBottom: "15px" }}
         >
           실시간 남은 좌석 확인
         </button>
+
+        {/* Mobile Authentication */}
+        <div className={styles.mobileAuthContainer}>
+          {user ? (
+            <div className={styles.mobileUserInfo}>
+              <div className={styles.mobileNickname}>
+                {user.nickname}님
+                {user.isAdmin && <span className={styles.adminBadge}>Admin</span>}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%", marginTop: "12px" }}>
+                <Link 
+                  href="/mypage" 
+                  className={styles.authBtn}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ width: "100%" }}
+                >
+                  마이페이지
+                </Link>
+                {user.isAdmin && (
+                  <Link 
+                    href="/admin" 
+                    className={`${styles.authBtn} ${styles.adminBtn}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ width: "100%" }}
+                  >
+                    관리자 페이지
+                  </Link>
+                )}
+                <button 
+                  className={styles.authBtn} 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  style={{ width: "100%" }}
+                >
+                  로그아웃
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link 
+              href="/login" 
+              className={styles.authBtn}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ display: "block", textAlign: "center" }}
+            >
+              로그인
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
 }
-

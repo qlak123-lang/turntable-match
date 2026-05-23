@@ -86,6 +86,7 @@
   margin-bottom: 24px;
   animation: slideUp 1s ease;
   font-weight: 800;
+  color: var(--white);
 }
 
 .headline em {
